@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,9 +13,33 @@ model User {
   password  String
   role      Role     @default(ADMIN)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Property {
+  id           String         @id @default(cuid())
+  title        String
+  slug         String         @unique
+  description  String
+  price        BigInt
+  location     String
+  status       PropertyStatus @default(AVAILABLE)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  imageUrl     String?
+  bathrooms    Int?
+  bedrooms     Int?
+  buildingSize Int?
+  landSize     Int?
 }
 
 enum Role {
   ADMIN
   SUPERADMIN
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  SOLD
+  BOOKED
 }
