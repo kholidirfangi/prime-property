@@ -39,8 +39,6 @@ export async function createProperty(data: CreatePropertyInput) {
     },
   });
 
-  console.log("CREATED PROPERTY:", property);
-
   return {
     success: true,
   };

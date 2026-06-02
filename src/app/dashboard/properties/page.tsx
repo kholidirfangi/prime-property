@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DeletePropertyButton from "@/components/DeletePropertyButton";
+import Image from "next/image";
 
 export default async function PropertiesPage() {
   const properties = await prisma.property.findMany({
@@ -32,7 +33,7 @@ export default async function PropertiesPage() {
               className="overflow-hidden rounded-xl border bg-white shadow-sm"
             >
               {property.imageUrl && (
-                <img
+                <Image width={600} height={600}
                   src={property.imageUrl}
                   alt={property.title}
                   className="h-56 w-full object-cover"

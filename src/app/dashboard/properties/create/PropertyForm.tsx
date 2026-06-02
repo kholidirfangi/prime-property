@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createProperty } from "@/app/actions/property-actions";
 import Image from "next/image";
+import { updateProperty } from "@/app/actions/update-property";
 
 type PropertyFormProps = {
   property?: {
@@ -58,6 +59,8 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
   const [uploading, setUploading] = useState(false);
 
+  const submitLabel = property ? "Update Property" : "Simpan Property";
+
   useEffect(() => {
     console.log("IMAGE URL CHANGED:", imageUrl);
   }, [imageUrl]);
@@ -96,23 +99,45 @@ export default function PropertyForm({ property }: PropertyFormProps) {
     try {
       setLoading(true);
 
-      console.log("IMAGE URL STATE:", imageUrl);
-      await createProperty({
-        title,
-        description,
-        location,
-        price: BigInt(price),
+      if (property) {
+        await updateProperty({
+          id: property.id,
 
-        bedrooms: bedrooms ? Number(bedrooms) : undefined,
+          title,
+          description,
+          location,
 
-        bathrooms: bathrooms ? Number(bathrooms) : undefined,
+          price: BigInt(price),
 
-        landSize: landSize ? Number(landSize) : undefined,
+          bedrooms: bedrooms ? Number(bedrooms) : undefined,
 
-        buildingSize: buildingSize ? Number(buildingSize) : undefined,
+          bathrooms: bathrooms ? Number(bathrooms) : undefined,
 
-        imageUrl,
-      });
+          landSize: landSize ? Number(landSize) : undefined,
+
+          buildingSize: buildingSize ? Number(buildingSize) : undefined,
+
+          imageUrl,
+        });
+      } else {
+        await createProperty({
+          title,
+          description,
+          location,
+
+          price: BigInt(price),
+
+          bedrooms: bedrooms ? Number(bedrooms) : undefined,
+
+          bathrooms: bathrooms ? Number(bathrooms) : undefined,
+
+          landSize: landSize ? Number(landSize) : undefined,
+
+          buildingSize: buildingSize ? Number(buildingSize) : undefined,
+
+          imageUrl,
+        });
+      }
 
       router.push("/dashboard/properties");
     } catch (error) {
@@ -253,7 +278,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           ? "Mengupload gambar..."
           : loading
             ? "Menyimpan..."
-            : "Simpan Property"}
+            : submitLabel}
       </Button>
     </form>
   );
