@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createProperty } from "@/app/actions/property-actions";
 import Image from "next/image";
 import { updateProperty } from "@/app/actions/update-property";
+import { PropertyStatus } from "@prisma/client";
 
 type PropertyFormProps = {
   property?: {
@@ -18,6 +19,7 @@ type PropertyFormProps = {
     title: string;
     description: string;
     location: string;
+    status: PropertyStatus;
     price: bigint;
     bedrooms: number | null;
     bathrooms: number | null;
@@ -31,6 +33,8 @@ export default function PropertyForm({ property }: PropertyFormProps) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+
+  const [status, setStatus] = useState<PropertyStatus>("AVAILABLE");
 
   const [title, setTitle] = useState(property?.title ?? "");
   const [location, setLocation] = useState(property?.location ?? "");
@@ -106,6 +110,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           title,
           description,
           location,
+          status,
 
           price: BigInt(price),
 
@@ -124,6 +129,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           title,
           description,
           location,
+          status,
 
           price: BigInt(price),
 
@@ -179,6 +185,22 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           onChange={(e) => setPrice(e.target.value)}
           required
         />
+
+        <div>
+          <label className="mb-2 block">Status Property</label>
+
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as PropertyStatus)}
+            className="w-full rounded-md border p-2"
+          >
+            <option value="AVAILABLE">Tersedia</option>
+
+            <option value="BOOKED">Dibooking</option>
+
+            <option value="SOLD">Terjual</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

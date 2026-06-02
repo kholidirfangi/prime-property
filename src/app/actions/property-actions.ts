@@ -1,12 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { PropertyStatus } from "@prisma/client";
 
 type CreatePropertyInput = {
   title: string;
   description: string;
   location: string;
+
   price: bigint;
+  status: PropertyStatus;
 
   bedrooms?: number;
   bathrooms?: number;
@@ -16,19 +19,24 @@ type CreatePropertyInput = {
   imageUrl?: string;
 };
 
-export async function createProperty(data: CreatePropertyInput) {
-  console.log("START CREATE");
-  console.log("DATA:", data);
+export async function createProperty(
+  data: CreatePropertyInput
+) {
+  const slug =
+    data.title.toLowerCase().replace(/\s+/g, "-") +
+    "-" +
+    Date.now();
 
-  const slug = data.title.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
-
-  const property = await prisma.property.create({
+  await prisma.property.create({
     data: {
       title: data.title,
       slug,
+
       description: data.description,
       location: data.location,
+
       price: data.price,
+      status: data.status,
 
       bedrooms: data.bedrooms,
       bathrooms: data.bathrooms,

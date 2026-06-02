@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { PropertyStatus } from "@prisma/client";
 
 type UpdatePropertyInput = {
   id: string;
@@ -9,6 +10,7 @@ type UpdatePropertyInput = {
   description: string;
   location: string;
   price: bigint;
+  status: PropertyStatus;
 
   bedrooms?: number;
   bathrooms?: number;
@@ -18,9 +20,7 @@ type UpdatePropertyInput = {
   imageUrl?: string;
 };
 
-export async function updateProperty(
-  data: UpdatePropertyInput
-) {
+export async function updateProperty(data: UpdatePropertyInput) {
   await prisma.property.update({
     where: {
       id: data.id,
@@ -30,6 +30,7 @@ export async function updateProperty(
       description: data.description,
       location: data.location,
       price: data.price,
+      status: data.status,
 
       bedrooms: data.bedrooms,
       bathrooms: data.bathrooms,

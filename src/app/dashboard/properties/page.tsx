@@ -33,7 +33,9 @@ export default async function PropertiesPage() {
               className="overflow-hidden rounded-xl border bg-white shadow-sm"
             >
               {property.imageUrl && (
-                <Image width={600} height={600}
+                <Image
+                  width={600}
+                  height={600}
                   src={property.imageUrl}
                   alt={property.title}
                   className="h-56 w-full object-cover"
@@ -54,6 +56,18 @@ export default async function PropertiesPage() {
                     <p className="text-lg font-bold text-[#C9A961]">
                       Rp {Number(property.price).toLocaleString("id-ID")}
                     </p>
+                    {/* Badge */}
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        property.status === "AVAILABLE"
+                          ? "bg-green-100 text-green-700"
+                          : property.status === "BOOKED"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {property.status}
+                    </span>
                   </div>
                 </div>
 
