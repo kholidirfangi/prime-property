@@ -37,7 +37,14 @@ export async function updateProperty(data: UpdatePropertyInput) {
       landSize: data.landSize,
       buildingSize: data.buildingSize,
 
-      imageUrls: data.imageUrls,
+      images: {
+        deleteMany: {},
+
+        create:
+          data.imageUrls?.map((url) => ({
+            imageUrl: url,
+          })) ?? [],
+      },
     },
   });
 
