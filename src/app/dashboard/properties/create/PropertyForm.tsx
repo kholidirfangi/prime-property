@@ -25,7 +25,10 @@ type PropertyFormProps = {
     bathrooms: number | null;
     landSize: number | null;
     buildingSize: number | null;
-    imageUrl: string | null;
+    images?: {
+      id: string;
+      imageUrl: string;
+    }[];
   };
 };
 
@@ -34,7 +37,9 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
   const [loading, setLoading] = useState(false);
 
-  const [status, setStatus] = useState<PropertyStatus>("AVAILABLE");
+  const [status, setStatus] = useState<PropertyStatus>(
+    property?.status ?? "AVAILABLE",
+  );
 
   const [title, setTitle] = useState(property?.title ?? "");
   const [location, setLocation] = useState(property?.location ?? "");
@@ -59,15 +64,13 @@ export default function PropertyForm({ property }: PropertyFormProps) {
     property?.buildingSize?.toString() ?? "",
   );
 
-  const [imageUrl, setImageUrl] = useState(property?.imageUrl ?? "");
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    property?.images?.map((img) => img.imageUrl) ?? [],
+  );
 
   const [uploading, setUploading] = useState(false);
 
   const submitLabel = property ? "Update Property" : "Simpan Property";
-
-  useEffect(() => {
-    console.log("IMAGE URL CHANGED:", imageUrl);
-  }, [imageUrl]);
 
   async function uploadImage(file: File) {
     const formData = new FormData();
@@ -84,11 +87,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       },
     );
 
-    console.log("STATUS:", response.status);
-
     const data = await response.json();
-
-    console.log("CLOUDINARY DATA:", data);
 
     if (!response.ok) {
       throw new Error(JSON.stringify(data));
@@ -122,7 +121,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
           buildingSize: buildingSize ? Number(buildingSize) : undefined,
 
-          imageUrl,
+          imageUrls,
         });
       } else {
         await createProperty({
@@ -141,7 +140,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
           buildingSize: buildingSize ? Number(buildingSize) : undefined,
 
-          imageUrl,
+          imageUrls,
         });
       }
 
@@ -262,22 +261,20 @@ export default function PropertyForm({ property }: PropertyFormProps) {
         <Input
           type="file"
           accept="image/*"
+          multiple
           onChange={async (e) => {
+            const files = e.target.files;
+
+            if (!files?.length) return;
+
             try {
-              const file = e.target.files?.[0];
-
-              if (!file) return;
-
               setUploading(true);
 
-              const uploadedUrl = await uploadImage(file);
+              const uploadedUrls = await Promise.all(
+                Array.from(files).map((file) => uploadImage(file)),
+              );
 
-              setImageUrl(uploadedUrl);
-
-              console.log("UPLOADED URL:", uploadedUrl);
-            } catch (error) {
-              console.error(error);
-              alert("Upload gambar gagal");
+              setImageUrls((prev) => [...prev, ...uploadedUrls]);
             } finally {
               setUploading(false);
             }
@@ -285,14 +282,32 @@ export default function PropertyForm({ property }: PropertyFormProps) {
         />
       </div>
 
-      {imageUrl && (
-        <Image
-          width={600}
-          height={600}
-          src={imageUrl}
-          alt="Preview"
-          className="mt-4 h-40 w-full rounded-lg object-cover"
-        />
+      {imageUrls.length > 0 && (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {imageUrls.map((url, index) => (
+            <div
+              key={`${url}-${index}`}
+              className="relative h-32 overflow-hidden rounded-lg"
+            >
+              <Image
+                src={url}
+                alt={`Property ${index + 1}`}
+                fill
+                className="object-cover"
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setImageUrls((prev) => prev.filter((_, i) => i !== index))
+                }
+                className="absolute right-2 top-2 rounded bg-red-600 px-2 py-1 text-xs text-white"
+              >
+                Hapus
+              </button>
+            </div>
+          ))}
+        </div>
       )}
 
       <Button type="submit" disabled={loading || uploading}>

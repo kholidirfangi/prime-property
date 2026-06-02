@@ -16,25 +16,23 @@ type CreatePropertyInput = {
   landSize?: number;
   buildingSize?: number;
 
-  imageUrl?: string;
+  imageUrls?: string[];
 };
 
-export async function createProperty(
-  data: CreatePropertyInput
-) {
-  const slug =
-    data.title.toLowerCase().replace(/\s+/g, "-") +
-    "-" +
-    Date.now();
+export async function createProperty(data: CreatePropertyInput) {
+  const slug = data.title.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
+
+  const images =
+    data.imageUrls?.map((url) => ({
+      imageUrl: url,
+    })) ?? [];
 
   await prisma.property.create({
     data: {
       title: data.title,
       slug,
-
       description: data.description,
       location: data.location,
-
       price: data.price,
       status: data.status,
 
@@ -43,7 +41,9 @@ export async function createProperty(
       landSize: data.landSize,
       buildingSize: data.buildingSize,
 
-      imageUrl: data.imageUrl,
+      images: {
+        create: images,
+      },
     },
   });
 

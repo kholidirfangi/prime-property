@@ -15,6 +15,9 @@ export default async function EditPropertyPage({
     where: {
       id,
     },
+    include: {
+      images: true,
+    },
   });
 
   if (!property) {

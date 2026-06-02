@@ -17,7 +17,7 @@ type UpdatePropertyInput = {
   landSize?: number;
   buildingSize?: number;
 
-  imageUrl?: string;
+  imageUrls?: string[];
 };
 
 export async function updateProperty(data: UpdatePropertyInput) {
@@ -37,7 +37,7 @@ export async function updateProperty(data: UpdatePropertyInput) {
       landSize: data.landSize,
       buildingSize: data.buildingSize,
 
-      imageUrl: data.imageUrl,
+      imageUrls: data.imageUrls,
     },
   });
 
