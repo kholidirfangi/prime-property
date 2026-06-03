@@ -3,12 +3,29 @@ import Image from "next/image";
 
 import { prisma } from "@/lib/prisma";
 import DeletePropertyButton from "@/components/DeletePropertyButton";
+import { PropertyStatus } from "@prisma/client";
 
-export default async function PropertiesPage() {
+export default async function PropertiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    status?: string;
+  }>;
+}) {
+  const { status } = await searchParams;
+
   const properties = await prisma.property.findMany({
+    where:
+      status && status !== "ALL"
+        ? {
+            status: status as PropertyStatus,
+          }
+        : undefined,
+
     include: {
       images: true,
     },
+
     orderBy: {
       createdAt: "desc",
     },
@@ -27,9 +44,56 @@ export default async function PropertiesPage() {
         </Link>
       </div>
 
+      {/* FILTER */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Link
+          href="/dashboard/properties"
+          className={`rounded-lg px-4 py-2 text-sm ${
+            !status
+              ? "bg-black text-white"
+              : "border bg-white hover:bg-gray-50"
+          }`}
+        >
+          Semua
+        </Link>
+
+        <Link
+          href="/dashboard/properties?status=AVAILABLE"
+          className={`rounded-lg px-4 py-2 text-sm ${
+            status === "AVAILABLE"
+              ? "bg-green-600 text-white"
+              : "border bg-white hover:bg-gray-50"
+          }`}
+        >
+          Tersedia
+        </Link>
+
+        <Link
+          href="/dashboard/properties?status=BOOKED"
+          className={`rounded-lg px-4 py-2 text-sm ${
+            status === "BOOKED"
+              ? "bg-yellow-500 text-white"
+              : "border bg-white hover:bg-gray-50"
+          }`}
+        >
+          Dibooking
+        </Link>
+
+        <Link
+          href="/dashboard/properties?status=SOLD"
+          className={`rounded-lg px-4 py-2 text-sm ${
+            status === "SOLD"
+              ? "bg-red-600 text-white"
+              : "border bg-white hover:bg-gray-50"
+          }`}
+        >
+          Terjual
+        </Link>
+      </div>
+
       {properties.length === 0 ? (
         <div className="rounded-lg border p-6">
-          Belum ada property.
+          Tidak ada property ditemukan.
         </div>
       ) : (
         <div className="grid gap-6">
@@ -42,7 +106,7 @@ export default async function PropertiesPage() {
                 <div className="relative h-55">
                   <Image
                     src={
-                      property.images[0]?.imageUrl ||
+                      property.images[0]?.imageUrl ??
                       "/placeholder-property.jpg"
                     }
                     alt={property.title}
@@ -64,7 +128,23 @@ export default async function PropertiesPage() {
                     </div>
 
                     <span className="text-lg font-bold text-green-600">
-                      Rp {Number(property.price).toLocaleString("id-ID")}
+                      Rp{" "}
+                      {Number(property.price).toLocaleString("id-ID")}
+                    </span>
+                  </div>
+
+                  {/* STATUS BADGE */}
+                  <div className="mt-3">
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                        property.status === "AVAILABLE"
+                          ? "bg-green-100 text-green-700"
+                          : property.status === "BOOKED"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {property.status}
                     </span>
                   </div>
 
@@ -85,6 +165,13 @@ export default async function PropertiesPage() {
                   </div>
 
                   <div className="mt-5 flex gap-2">
+                    <Link
+                      href={`/property/${property.slug}`}
+                      className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                    >
+                      Lihat Detail
+                    </Link>
+
                     <Link
                       href={`/dashboard/properties/${property.id}/edit`}
                       className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
