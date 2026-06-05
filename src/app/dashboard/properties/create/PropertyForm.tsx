@@ -20,6 +20,7 @@ type PropertyFormProps = {
     description: string;
     location: string;
     status: PropertyStatus;
+    featured: boolean;
     price: bigint;
     bedrooms: number | null;
     bathrooms: number | null;
@@ -34,6 +35,8 @@ type PropertyFormProps = {
 
 export default function PropertyForm({ property }: PropertyFormProps) {
   const router = useRouter();
+
+  const [featured, setFeatured] = useState(property?.featured ?? false);
 
   const [loading, setLoading] = useState(false);
 
@@ -110,6 +113,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           description,
           location,
           status,
+          featured,
 
           price: BigInt(price),
 
@@ -129,6 +133,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           description,
           location,
           status,
+          featured,
 
           price: BigInt(price),
 
@@ -155,6 +160,24 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="rounded-lg border p-4">
+        <label className="flex cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            checked={featured}
+            onChange={(e) => setFeatured(e.target.checked)}
+            className="h-4 w-4"
+          />
+
+          <div>
+            <p className="font-medium">Property Unggulan</p>
+
+            <p className="text-sm text-gray-500">
+              Tampilkan property ini pada section featured di homepage.
+            </p>
+          </div>
+        </label>
+      </div>
       <div>
         <label className="mb-2 block">Judul Property</label>
 

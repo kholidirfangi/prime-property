@@ -17,13 +17,18 @@ model User {
 }
 
 model Property {
-  id          String         @id @default(cuid())
+  id          String @id @default(cuid())
+
   title       String
-  slug        String         @unique
+  slug        String @unique
   description String
+
   location    String
   price       BigInt
+
   status      PropertyStatus
+
+  featured    Boolean @default(false)
 
   bedrooms     Int?
   bathrooms    Int?

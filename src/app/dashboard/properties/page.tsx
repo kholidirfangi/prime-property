@@ -10,17 +10,47 @@ export default async function PropertiesPage({
 }: {
   searchParams: Promise<{
     status?: string;
+    search?: string;
+    page?: string;
   }>;
 }) {
-  const { status } = await searchParams;
+  const { status, search, page } = await searchParams;
+  const currentPage = Number(page) || 1;
+
+  const PAGE_SIZE = 10;
+
+  const where = {
+    ...(status &&
+      status !== "ALL" && {
+        status: status as PropertyStatus,
+      }),
+
+    ...(search && {
+      OR: [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          location: {
+            contains: search,
+            mode: "insensitive" as const,
+          },
+        },
+      ],
+    }),
+  };
+
+  const totalProperties = await prisma.property.count({
+    where,
+  });
+
+  const totalPages = Math.ceil(totalProperties / PAGE_SIZE);
 
   const properties = await prisma.property.findMany({
-    where:
-      status && status !== "ALL"
-        ? {
-            status: status as PropertyStatus,
-          }
-        : undefined,
+    where,
 
     include: {
       images: true,
@@ -29,7 +59,12 @@ export default async function PropertiesPage({
     orderBy: {
       createdAt: "desc",
     },
+
+    skip: (currentPage - 1) * PAGE_SIZE,
+
+    take: PAGE_SIZE,
   });
+
 
   return (
     <div>
@@ -44,21 +79,44 @@ export default async function PropertiesPage({
         </Link>
       </div>
 
+      <div className="mb-6">
+        <form className="flex gap-2">
+          <input
+            type="text"
+            name="search"
+            defaultValue={search}
+            placeholder="Cari property..."
+            className="flex-1 rounded-lg border px-4 py-2"
+          />
+
+          <button
+            type="submit"
+            className="rounded-lg bg-black px-4 py-2 text-white"
+          >
+            Cari
+          </button>
+
+          {status && <input type="hidden" name="status" value={status} />}
+        </form>
+      </div>
+
       {/* FILTER */}
       <div className="mb-6 flex flex-wrap gap-2">
         <Link
-          href="/dashboard/properties"
+          href={`/dashboard/properties${
+            search ? `?search=${encodeURIComponent(search)}` : ""
+          }`}
           className={`rounded-lg px-4 py-2 text-sm ${
-            !status
-              ? "bg-black text-white"
-              : "border bg-white hover:bg-gray-50"
+            !status ? "bg-black text-white" : "border bg-white hover:bg-gray-50"
           }`}
         >
           Semua
         </Link>
 
         <Link
-          href="/dashboard/properties?status=AVAILABLE"
+          href={`/dashboard/properties?status=AVAILABLE${
+            search ? `&search=${encodeURIComponent(search)}` : ""
+          }`}
           className={`rounded-lg px-4 py-2 text-sm ${
             status === "AVAILABLE"
               ? "bg-green-600 text-white"
@@ -69,7 +127,9 @@ export default async function PropertiesPage({
         </Link>
 
         <Link
-          href="/dashboard/properties?status=BOOKED"
+          href={`/dashboard/properties?status=BOOKED${
+            search ? `&search=${encodeURIComponent(search)}` : ""
+          }`}
           className={`rounded-lg px-4 py-2 text-sm ${
             status === "BOOKED"
               ? "bg-yellow-500 text-white"
@@ -80,7 +140,9 @@ export default async function PropertiesPage({
         </Link>
 
         <Link
-          href="/dashboard/properties?status=SOLD"
+          href={`/dashboard/properties?status=SOLD${
+            search ? `&search=${encodeURIComponent(search)}` : ""
+          }`}
           className={`rounded-lg px-4 py-2 text-sm ${
             status === "SOLD"
               ? "bg-red-600 text-white"
@@ -128,8 +190,7 @@ export default async function PropertiesPage({
                     </div>
 
                     <span className="text-lg font-bold text-green-600">
-                      Rp{" "}
-                      {Number(property.price).toLocaleString("id-ID")}
+                      Rp {Number(property.price).toLocaleString("id-ID")}
                     </span>
                   </div>
 
@@ -185,6 +246,50 @@ export default async function PropertiesPage({
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="mt-8 flex items-center justify-center gap-2">
+          {currentPage > 1 && (
+            <Link
+              href={`/dashboard/properties?page=${currentPage - 1}${
+                status ? `&status=${status}` : ""
+              }${search ? `&search=${encodeURIComponent(search)}` : ""}`}
+              className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+            >
+              ← Previous
+            </Link>
+          )}
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+            (pageNumber) => (
+              <Link
+                key={pageNumber}
+                href={`/dashboard/properties?page=${pageNumber}${
+                  status ? `&status=${status}` : ""
+                }${search ? `&search=${encodeURIComponent(search)}` : ""}`}
+                className={`rounded-lg px-4 py-2 ${
+                  pageNumber === currentPage
+                    ? "bg-black text-white"
+                    : "border hover:bg-gray-50"
+                }`}
+              >
+                {pageNumber}
+              </Link>
+            ),
+          )}
+
+          {currentPage < totalPages && (
+            <Link
+              href={`/dashboard/properties?page=${currentPage + 1}${
+                status ? `&status=${status}` : ""
+              }${search ? `&search=${encodeURIComponent(search)}` : ""}`}
+              className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+            >
+              Next →
+            </Link>
+          )}
         </div>
       )}
     </div>

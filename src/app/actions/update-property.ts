@@ -11,6 +11,7 @@ type UpdatePropertyInput = {
   location: string;
   price: bigint;
   status: PropertyStatus;
+  featured: boolean;
 
   bedrooms?: number;
   bathrooms?: number;
@@ -31,6 +32,7 @@ export async function updateProperty(data: UpdatePropertyInput) {
       location: data.location,
       price: data.price,
       status: data.status,
+      featured: data.featured,
 
       bedrooms: data.bedrooms,
       bathrooms: data.bathrooms,

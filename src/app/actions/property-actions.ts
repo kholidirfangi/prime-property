@@ -10,6 +10,7 @@ type CreatePropertyInput = {
 
   price: bigint;
   status: PropertyStatus;
+  featured: boolean;
 
   bedrooms?: number;
   bathrooms?: number;
@@ -35,6 +36,7 @@ export async function createProperty(data: CreatePropertyInput) {
       location: data.location,
       price: data.price,
       status: data.status,
+      featured: data.featured,
 
       bedrooms: data.bedrooms,
       bathrooms: data.bathrooms,
