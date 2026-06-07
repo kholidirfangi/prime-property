@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import PropertyForm from "../../create/PropertyForm";
+import { requireSuperadmin } from "@/lib/require-superadmin";
 
 export default async function EditPropertyPage({
   params,
@@ -10,6 +11,7 @@ export default async function EditPropertyPage({
   }>;
 }) {
   const { id } = await params;
+  await requireSuperadmin();
 
   const property = await prisma.property.findUnique({
     where: {

@@ -5,10 +5,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
         {/* Logo */}
-        <Link
-          href="/"
-          className="text-xl font-bold text-[#1A1A1A]"
-        >
+        <Link href="/" className="text-xl font-bold text-[#1A1A1A]">
           Prime Property
         </Link>
 
@@ -38,7 +35,7 @@ export default function Header() {
 
         {/* Login Agent */}
         <Link
-          href="/login"
+          href="/agent/login"
           className="rounded-lg border border-[#C9A961] px-4 py-2 text-sm font-medium text-[#C9A961] transition hover:bg-[#C9A961] hover:text-black"
         >
           Login Agent

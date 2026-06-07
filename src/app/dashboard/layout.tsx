@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { logoutAction } from "../actions/logout-actions";
+import Link from "next/link";
 
 export default async function DashboardLayout({
   children,
@@ -10,7 +11,7 @@ export default async function DashboardLayout({
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/agent/login");
   }
 
   return (
@@ -22,26 +23,35 @@ export default async function DashboardLayout({
         </div>
 
         <nav className="space-y-2 px-4">
-          <a
+          <Link
             href="/dashboard"
             className="block rounded px-3 py-2 hover:bg-slate-200"
           >
             Dashboard
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/dashboard/properties"
             className="block rounded px-3 py-2 hover:bg-slate-200"
           >
             Properties
-          </a>
+          </Link>
 
-          <a
+          {user.role === "SUPERADMIN" && (
+            <Link
+              href="/dashboard/admins"
+              className="block rounded px-3 py-2 hover:bg-slate-200"
+            >
+              Admins
+            </Link>
+          )}
+
+          <Link
             href="/dashboard/settings"
             className="block rounded px-3 py-2 hover:bg-slate-200"
           >
             Settings
-          </a>
+          </Link>
 
           <div className="pt-8">
             <form action={logoutAction}>
@@ -62,7 +72,9 @@ export default async function DashboardLayout({
           <div className="flex items-center justify-between">
             <h1 className="font-semibold">Admin Dashboard</h1>
 
-            <span>{user.email}</span>
+            <span>
+              {user.email} ({user.role})
+            </span>
           </div>
         </header>
 

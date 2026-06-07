@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginAction } from "../actions/auth-actions";
+import { loginAction } from "../../actions/auth-actions";
 
 export function LoginForm() {
   const router = useRouter();

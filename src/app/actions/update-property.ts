@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireSuperadmin } from "@/lib/require-superadmin";
 import { PropertyStatus } from "@prisma/client";
 
 type UpdatePropertyInput = {
@@ -22,6 +23,7 @@ type UpdatePropertyInput = {
 };
 
 export async function updateProperty(data: UpdatePropertyInput) {
+   await requireSuperadmin();
   await prisma.property.update({
     where: {
       id: data.id,

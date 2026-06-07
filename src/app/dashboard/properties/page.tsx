@@ -4,6 +4,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import DeletePropertyButton from "@/components/DeletePropertyButton";
 import { PropertyStatus } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth";
 
 export default async function PropertiesPage({
   searchParams,
@@ -16,6 +17,7 @@ export default async function PropertiesPage({
 }) {
   const { status, search, page } = await searchParams;
   const currentPage = Number(page) || 1;
+  const user = await getCurrentUser();
 
   const PAGE_SIZE = 10;
 
@@ -65,18 +67,14 @@ export default async function PropertiesPage({
     take: PAGE_SIZE,
   });
 
-
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Properties</h1>
 
-        <Link
-          href="/dashboard/properties/create"
-          className="rounded-lg bg-black px-4 py-2 text-white transition hover:bg-neutral-800"
-        >
-          Tambah Property
-        </Link>
+        {user?.role === "SUPERADMIN" && (
+          <Link href="/dashboard/properties/create">Tambah Property</Link>
+        )}
       </div>
 
       <div className="mb-6">
@@ -233,14 +231,18 @@ export default async function PropertiesPage({
                       Lihat Detail
                     </Link>
 
-                    <Link
-                      href={`/dashboard/properties/${property.id}/edit`}
-                      className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    >
-                      Edit
-                    </Link>
+                    {user?.role === "SUPERADMIN" && (
+                      <Link
+                        href={`/dashboard/properties/${property.id}/edit`}
+                        className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                      >
+                        Edit
+                      </Link>
+                    )}
 
-                    <DeletePropertyButton id={property.id} />
+                    {user?.role === "SUPERADMIN" && (
+                      <DeletePropertyButton id={property.id} />
+                    )}
                   </div>
                 </div>
               </div>

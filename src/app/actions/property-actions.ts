@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { PropertyStatus } from "@prisma/client";
+import { requireSuperadmin } from "@/lib/require-superadmin";
 
 type CreatePropertyInput = {
   title: string;
@@ -21,6 +22,7 @@ type CreatePropertyInput = {
 };
 
 export async function createProperty(data: CreatePropertyInput) {
+  await requireSuperadmin();
   const slug = data.title.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
 
   const images =

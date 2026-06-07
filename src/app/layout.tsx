@@ -9,6 +9,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import Header from "@/components/public/Header";
 import Footer from "@/components/public/Footer";
+import { Toaster } from "sonner";
 
 const playfairDisplayHeading = Playfair_Display({
   subsets: ["latin"],
@@ -50,7 +51,10 @@ export default function RootLayout({
         playfairDisplayHeading.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster richColors position="top-right" />
+      </body>
     </html>
   );
 }
