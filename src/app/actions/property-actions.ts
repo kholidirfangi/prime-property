@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { PropertyStatus } from "@prisma/client";
 import { requireSuperadmin } from "@/lib/require-superadmin";
+import { createAuditLog } from "@/lib/audit-log";
 
 type CreatePropertyInput = {
   title: string;
@@ -19,10 +20,12 @@ type CreatePropertyInput = {
   buildingSize?: number;
 
   imageUrls?: string[];
+
+  property: string;
 };
 
 export async function createProperty(data: CreatePropertyInput) {
-  await requireSuperadmin();
+  const user = await requireSuperadmin();
   const slug = data.title.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
 
   const images =
@@ -30,7 +33,7 @@ export async function createProperty(data: CreatePropertyInput) {
       imageUrl: url,
     })) ?? [];
 
-  await prisma.property.create({
+  const property = await prisma.property.create({
     data: {
       title: data.title,
       slug,
@@ -49,6 +52,17 @@ export async function createProperty(data: CreatePropertyInput) {
         create: images,
       },
     },
+  });
+
+  await createAuditLog({
+    action: "CREATE_PROPERTY",
+
+    entityType: "PROPERTY",
+    entityId: property.id,
+
+    description: `Membuat property ${property.title}`,
+
+    performedById: user.id,
   });
 
   return {

@@ -1,5 +1,6 @@
 "use server";
 
+import { createAuditLog } from "@/lib/audit-log";
 import { prisma } from "@/lib/prisma";
 import { requireSuperadmin } from "@/lib/require-superadmin";
 import { PropertyStatus } from "@prisma/client";
@@ -23,8 +24,8 @@ type UpdatePropertyInput = {
 };
 
 export async function updateProperty(data: UpdatePropertyInput) {
-   await requireSuperadmin();
-  await prisma.property.update({
+  const user = await requireSuperadmin();
+  const property = await prisma.property.update({
     where: {
       id: data.id,
     },
@@ -50,6 +51,14 @@ export async function updateProperty(data: UpdatePropertyInput) {
           })) ?? [],
       },
     },
+  });
+
+  await createAuditLog({
+    action: "UPDATE_PROPERTY",
+    entityType: "PROPERTY",
+    entityId: property.id,
+    description: `Mengubah property ${property.title}`,
+    performedById: user.id,
   });
 
   return {

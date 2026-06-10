@@ -73,7 +73,12 @@ export default async function PropertiesPage({
         <h1 className="text-3xl font-bold">Properties</h1>
 
         {user?.role === "SUPERADMIN" && (
-          <Link href="/dashboard/properties/create">Tambah Property</Link>
+          <Link
+            className="rounded-lg bg-black px-4 py-2 text-white"
+            href="/dashboard/properties/create"
+          >
+            Tambah Property
+          </Link>
         )}
       </div>
 

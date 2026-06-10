@@ -1,5 +1,6 @@
 "use server";
 
+import { createAuditLog } from "@/lib/audit-log";
 import { prisma } from "@/lib/prisma";
 import { requireSuperadmin } from "@/lib/require-superadmin";
 
@@ -40,6 +41,21 @@ export async function toggleAdminStatus(
       isActive,
     },
   });
+
+  await createAuditLog({
+  action: isActive
+    ? "ENABLE_ADMIN"
+    : "DISABLE_ADMIN",
+
+  entityType: "USER",
+  entityId: user.id,
+
+  description: `${
+    isActive ? "Mengaktifkan" : "Menonaktifkan"
+  } admin ${user.email}`,
+
+  performedById: currentUser.id,
+});
 
   return {
     success: true,

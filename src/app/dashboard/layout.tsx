@@ -38,12 +38,21 @@ export default async function DashboardLayout({
           </Link>
 
           {user.role === "SUPERADMIN" && (
-            <Link
-              href="/dashboard/admins"
-              className="block rounded px-3 py-2 hover:bg-slate-200"
-            >
-              Admins
-            </Link>
+            <>
+              <Link
+                href="/dashboard/admins"
+                className="block rounded px-3 py-2 hover:bg-slate-200"
+              >
+                Admins
+              </Link>
+
+              <Link
+                href="/dashboard/audit-logs"
+                className="block rounded px-3 py-2 hover:bg-slate-200"
+              >
+                Audit Logs
+              </Link>
+            </>
           )}
 
           <Link

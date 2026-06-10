@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { requireSuperadmin } from "@/lib/require-superadmin";
 import { Role } from "@prisma/client";
+import { createAuditLog } from "@/lib/audit-log";
 
 type CreateAdminInput = {
   email: string;
@@ -29,12 +30,26 @@ export async function createAdmin(data: CreateAdminInput) {
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
-  await prisma.user.create({
+  const admin = await prisma.user.create({
     data: {
       email: data.email,
       password: hashedPassword,
       role: data.role,
     },
+  });
+
+  const currentUser = await prisma.user.findFirst({
+    where: {
+      role: "SUPERADMIN",
+    },
+  });
+
+  await createAuditLog({
+    action: "CREATE_ADMIN",
+    entityType: "USER",
+    entityId: admin.id,
+    description: `Membuat admin ${admin.email}`,
+    performedById: currentUser?.id || "",
   });
 
   return {
