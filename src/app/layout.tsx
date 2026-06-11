@@ -7,8 +7,6 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import Header from "@/components/public/Header";
-import Footer from "@/components/public/Footer";
 import { Toaster } from "sonner";
 
 const playfairDisplayHeading = Playfair_Display({

@@ -20,8 +20,6 @@ type CreatePropertyInput = {
   buildingSize?: number;
 
   imageUrls?: string[];
-
-  property: string;
 };
 
 export async function createProperty(data: CreatePropertyInput) {
